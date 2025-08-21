@@ -1,0 +1,111 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f2f2f2;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.login-form {
+  background: #ffffff;
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-form h2 {
+  margin-bottom: 20px;
+  color: #333333;
+}
+
+.login-form input,
+.login-form select {
+  width: 100%;
+  padding: 10px 15px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  appearance: none; /* Ensures the dropdown is styled consistently across browsers */
+  -webkit-appearance: none; /* Safari and Chrome */
+  -moz-appearance: none; /* Firefox */
+}
+
+.login-form input:focus,
+.login-form select:focus {
+  border-color: #42a5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.login-form select {
+  background-color: #fff; /* Ensures background color consistency */
+  position: relative; /* Helps position the dropdown */
+}
+
+.login-form button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #42a5f5;
+  color: #ffffff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-form button:hover {
+  background-color: #1e88e5;
+}
+
+.login-form button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 10px;
+  }
+
+  .login-form {
+    padding: 30px 20px;
+  }
+
+  .login-form h2 {
+    font-size: 1.5em;
+  }
+
+  .login-form input,
+  .login-form select,
+  .login-form button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    padding: 20px 15px;
+  }
+
+  .login-form h2 {
+    font-size: 1.2em;
+  }
+
+  .login-form input,
+  .login-form select,
+  .login-form button {
+    font-size: 12px;
+  }
+}

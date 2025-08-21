@@ -1,0 +1,35 @@
+
+.cart-cart{
+    height: 100%;
+    width: 100%;
+}
+.products-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.product-item {
+    flex: 1 1 300px; /* Flex-grow, flex-shrink, and base width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+@media (max-width: 768px) {
+
+    .products-container {
+        gap: 10px;
+    }
+
+    .product-item {
+        flex: 1 1 100%;
+    }
+}
+

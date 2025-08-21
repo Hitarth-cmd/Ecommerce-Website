@@ -1,0 +1,115 @@
+.body {
+    margin-top: 5px;
+    width: 100%;
+    font-family: 'Arial', sans-serif;
+}
+
+.content-video {
+    height: 85vh;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.content-video-1 {
+    height: 100%;
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white; /* Text color */
+    z-index: 1;
+}
+
+.content-video-1 > img {
+    max-height: 80%;
+    max-width: 80%;
+    border-radius: 10px;
+}
+
+video {
+    height: 100%;
+    width: 70%;
+    object-fit: cover; /* Ensure video covers the area */
+    z-index: 0;
+}
+
+.products {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.products > h1 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: #f5f5f5; /* Light background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.products-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.product-item {
+    flex: 1 1 300px; /* Flex-grow, flex-shrink, and base width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.product-item:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
+}
+
+@media (max-width: 768px) {
+    .content-video {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .content-video-1 {
+        width: 100%;
+        height: auto;
+        padding: 20px;
+    }
+
+    video {
+        width: 100%;
+        height: auto;
+    }
+
+    .products > h1 {
+        font-size: 1.5rem;
+        margin-top: 10px;
+    }
+
+    .products-container {
+        gap: 10px;
+    }
+
+    .product-item {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .content-video-1 > img {
+        max-height: 60%;
+        max-width: 60%;
+    }
+
+    .products > h1 {
+        font-size: 1.2rem;
+    }
+}
