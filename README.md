@@ -1,7 +1,7 @@
 E-Commerce Web Application
 ==========================
 
-This is an e-commerce web application built with the MERN (MongoDB, Express.js, React.js, Node.js) stack. The application includes features like user authentication, product search, cart management, and handling of ordered and refunded products.
+This is an e-commerce web application built with React.js, Node.js, and Express.js. The application includes features like user authentication, product search, cart management, and handling of ordered and refunded products.
 
 Features
 --------
@@ -20,13 +20,15 @@ Features
 Tech Stack
 ----------
 
-*   **Frontend**: React.js
+*   **Frontend**: React.js, Redux Toolkit
     
-*   **Backend**: Node.js, Express.js , Razorpay
+*   **Backend**: Node.js, Express.js, Razorpay
     
-*   **Database**: MongoDB
+*   **Database**: Supabase (PostgreSQL)
     
 *   **Styling**: CSS, CSS Modules
+    
+*   **Deployment**: Vercel
     
 
 Getting Started
@@ -38,34 +40,74 @@ Getting Started
     
 *   npm or yarn
     
-*   MongoDB
+*   Supabase account
     
 
 ### Installation
 
-1.  bashCopy codegit clone https://github.com/roy7077/payment-gateway.gitcd ecommerce-app
+1.  ```bash
+    git clone https://github.com/roy7077/payment-gateway.git
+    cd ecommerce-app
+    ```
     
-2.  bashCopy codecd servernpm install
+2.  ```bash
+    cd server
+    npm install
+    ```
     
-3.  bashCopy codecd ../clientnpm install
+3.  ```bash
+    cd ../client
+    npm install
+    ```
     
+4.  ```bash
+    cd ..
+    npm install
+    ```
 
 ### Environment Variables
 
-Create a .env file in the server directory and add the following environment variables:
+Create a `.env` file in the server directory and add the following environment variables:
 
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+JWT_SECRET=your_jwt_secret
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 ```
-MONGO_URI=your_mongodb_connection_string  
-JWT_SECRET=your_jwt_secret  
-RAZORPAY_KEY_ID=your_razorpay_key_id  
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret   `
-```
+
 ### Running the Application
 
-1.  bashCopy codecd server npm start
+1.  ```bash
+    cd server
+    npm start
+    ```
     
-2.  bashCopy codecd ../client npm start
+2.  ```bash
+    cd ../client
+    npm start
+    ```
     
+3.  Or run both simultaneously from root:
+    ```bash
+    npm run dev
+    ```
+
+## Deployment
+
+### Deploy to Vercel
+
+This application is configured for easy deployment on Vercel. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+
+Quick deployment:
+```bash
+npm i -g vercel
+npm run install-all
+npm run build
+vercel
+```
+
 API Endpoints
 -------------
 

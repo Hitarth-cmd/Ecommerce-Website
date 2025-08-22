@@ -44,7 +44,7 @@ const Cart = () => {
     };
 
     fetchCartItems();
-  }, []);
+  }, [navigate]);
 
   const removeFromCart = (productId) => {
     setData(data.filter(item => (item.id || item._id) !== productId));

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import '../Style/cart.css';
 import OrderedProductCard from './OrderedProductCard';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ const OrderedProducts = () => {
 
     const navigate = useNavigate();
 
-    const fetchData = async (req,res) => {
+    const fetchData = useCallback(async (req,res) => {
         const token = localStorage.getItem('token');
         if(!token){
             alert("Login first");
@@ -42,11 +42,11 @@ const OrderedProducts = () => {
             alert("Failed to load ordered items. Please try again later.");
             setLoading(false);
         }
-    }
+    }, [navigate]);
 
     useEffect(()=>{
         fetchData();
-    },[]);
+    },[fetchData]);
 
     const removeFromCart = (productId) => {
         setData(data.filter(item => item._id !== productId));

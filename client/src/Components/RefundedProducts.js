@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import '../Style/cart.css';
-import OrderedProductCard from './OrderedProductCard';
 import RefundedCard from './RefundedCard';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +9,7 @@ const RefundedProducts = () => {
 
     const navigate = useNavigate();
 
-    const fetchData = async (req,res) => {
+    const fetchData = useCallback(async (req,res) => {
         const token = localStorage.getItem('token');
         if(!token){
             alert("Login first");
@@ -43,11 +42,11 @@ const RefundedProducts = () => {
             alert("Failed to load Refunded items. Please try again later.");
             setLoading(false);
         }
-    }
+    }, [navigate]);
 
     useEffect(()=>{
         fetchData();
-    },[]);
+    },[fetchData]);
 
     
       return (

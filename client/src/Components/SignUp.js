@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { toggle } from '../utils/Cartslice';
 import '../Style/signup.css';
 
 const SignUp = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     userName: '',
@@ -41,7 +38,6 @@ const SignUp = () => {
 
       if (response.ok) {
         console.log('User registered successfully:', result);
-        //dispatch(toggle());
         navigate('/');
       } else if (response.status === 400 && result.message === 'User is already Registered') {
         alert(result.message);

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggle } from '../utils/Cartslice';
@@ -8,25 +8,23 @@ import "../Style/navBar.css";
 const NavBar = () => {
   const [searchText, setSearchText] = useState('abc');
   const [text, setText] = useState('');
-  const [productData, setProductData] = useState(null);
 
   const navigate = useNavigate();
   const selector = useSelector(store => store);
   const dispatch = useDispatch();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const data = await fetch(`https://dummyjson.com/products/search?q=${searchText}`);
     const json = await data.json();
-    setProductData(json.products);
 
     if (searchText === "abc") return;
 
     navigate('/searchedProduct', { state: { productData: json.products } });
-  }
+  }, [searchText, navigate]);
 
   useEffect(() => {
     fetchData();
-  }, [searchText])
+  }, [fetchData])
 
   const handleLogout = () => {
     localStorage.removeItem('token');

@@ -81,8 +81,10 @@ const Body = () => {
         <div className='body'>
             <div className='content-video'>
                 <div className='content-video-1'>
-                    <img src="https://c8.alamy.com/comp/2KKFMED/stylish-man-cartoon-male-characters-men-in-fashion-clothes-flat-style-vector-illustration-2KKFMED.jpg">
-                    </img>
+                    <img 
+                        src="https://c8.alamy.com/comp/2KKFMED/stylish-man-cartoon-male-characters-men-in-fashion-clothes-flat-style-vector-illustration-2KKFMED.jpg"
+                        alt="stylish man cartoon"
+                    />
                 </div>
                 <video
                     src={video}
