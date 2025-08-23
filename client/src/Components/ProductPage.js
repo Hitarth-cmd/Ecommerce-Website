@@ -23,108 +23,175 @@ const ProductPage = () => {
         }
 
         try {
-            const keyResponse = await fetch("http://localhost:8080/api/v1/getkey");
-            const { key_id } = await keyResponse.json();
-            console.log('Key Data:', key_id);
-    
-            const requestBody = {
-                amount: Number(product.price) || 1,
-                currency: "INR",
-                receipt: "Receipt no. 1"
-            };
-    
-            const checkoutResponse = await fetch("http://localhost:8080/api/v1/checkout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
-    
-            if (!checkoutResponse.ok) {
-                const err = await checkoutResponse.json().catch(() => ({}));
-                throw new Error(err.message || `Checkout failed: ${checkoutResponse.status}`);
-            }
-            const checkoutData = await checkoutResponse.json();
-            //console.log('Checkout Data:', checkoutData);
+            console.log("Starting payment process...");
+            
+            // Try deployed backend first, fallback to localhost if needed
+            let backendUrl = "https://ecom-website-beige.vercel.app";
+            let key_id = null;
+            let orderData = null;
 
-            // const token = localStorage.getItem('token');
-            //const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZU51bWJlciI6Ijg3Mjg4NTM1NTQiLCJhY2NvdW50VHlwZSI6IkN1c3RvbWVyIiwiaWQiOiI2NjlkMGViMzYxZGY5OWUzMDc1N2IyZmMiLCJpYXQiOjE3MjE1Njg5NTMsImV4cCI6MTcyMTU4MzM1M30.xbRGqhboXQDENg1_Yj2LeGymBRXCmEwlsJx95tGrSQY"
+            try {
+                // First attempt: Get Razorpay key from deployed backend
+                console.log("Trying deployed backend...");
+                const keyResponse = await fetch(`${backendUrl}/api/v1/getkey`);
+                
+                if (keyResponse.ok) {
+                    const keyData = await keyResponse.json();
+                    key_id = keyData.key_id;
+                    console.log('Key received from deployed backend:', key_id);
+                } else {
+                    throw new Error('Deployed backend key fetch failed');
+                }
+
+                // Create order on deployed backend
+                const requestBody = {
+                    amount: Number(product.price) || 1,
+                    currency: "INR",
+                    receipt: "Receipt no. 1"
+                };
+
+                const checkoutResponse = await fetch(`${backendUrl}/api/v1/checkout`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (checkoutResponse.ok) {
+                    orderData = await checkoutResponse.json();
+                    console.log('Order created on deployed backend:', orderData);
+                } else {
+                    throw new Error('Deployed backend order creation failed');
+                }
+
+            } catch (deployedError) {
+                console.log("Deployed backend failed, trying localhost...", deployedError);
+                
+                // Fallback to localhost
+                backendUrl = "http://localhost:8080";
+                
+                try {
+                    const keyResponse = await fetch(`${backendUrl}/api/v1/getkey`);
+                    if (keyResponse.ok) {
+                        const keyData = await keyResponse.json();
+                        key_id = keyData.key_id;
+                        console.log('Key received from localhost:', key_id);
+                    } else {
+                        throw new Error('Localhost key fetch failed');
+                    }
+
+                    const requestBody = {
+                        amount: Number(product.price) || 1,
+                        currency: "INR",
+                        receipt: "Receipt no. 1"
+                    };
+
+                    const checkoutResponse = await fetch(`${backendUrl}/api/v1/checkout`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    if (checkoutResponse.ok) {
+                        orderData = await checkoutResponse.json();
+                        console.log('Order created on localhost:', orderData);
+                    } else {
+                        throw new Error('Localhost order creation failed');
+                    }
+
+                } catch (localhostError) {
+                    console.error("Both backends failed:", localhostError);
+                    throw new Error('Unable to connect to payment server. Please try again later.');
+                }
+            }
+
+            if (!key_id || !orderData) {
+                throw new Error('Failed to get payment credentials');
+            }
+
+            // Ensure amount is in paise (Razorpay requirement)
+            const amountInPaise = Math.round((Number(product.price) || 1) * 100);
 
             const options = {
                 key: key_id,
-                amount: checkoutData.paymentResponse.amount,
+                amount: amountInPaise,
                 currency: "INR",
-                name: "Sagar ray",
-                description: "Test Mode",
-                order_id: checkoutData.paymentResponse.id,
+                name: "E-commerce Store",
+                description: `Purchase: ${product.title}`,
+                order_id: orderData.paymentResponse?.id || orderData.id,
                 handler: async (response) => {
-                    console.log("response", response)
+                    console.log("Payment response received:", response);
                     try {
-                        const res = await fetch(`http://localhost:8080/api/v1/paymentverification`, {
+                        const verificationBody = {
+                            product,
+                            token: token,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        };
+
+                        const res = await fetch(`${backendUrl}/api/v1/paymentverification`, {
                             method: 'POST',
                             headers: {
                                 'content-type': 'application/json',
                                 'Authorization': `Bearer ${token}`
                             },
-                            body: JSON.stringify({
-                                product,
-                                token:token,
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                            })
-                        })
-        
-                        const verifyData = await res.json();
-        
-                        if (verifyData && verifyData.success) {
-                            console.log("Payment verified successfully on FE");
-                            navigate(`/paymentsuccess?reference=${verifyData.reference || response.razorpay_payment_id}`);
+                            body: JSON.stringify(verificationBody)
+                        });
+
+                        if (res.ok) {
+                            const verifyData = await res.json();
+                            if (verifyData && verifyData.success) {
+                                console.log("Payment verified successfully!");
+                                navigate(`/paymentsuccess?reference=${verifyData.reference || response.razorpay_payment_id}`);
+                            } else {
+                                alert("Payment verification failed. Please contact support.");
+                            }
+                        } else {
+                            console.error("Verification request failed:", res.status);
+                            alert("Payment verification failed. Please contact support.");
                         }
                     } catch (error) {
-                        console.log(error);
+                        console.error("Payment verification error:", error);
+                        alert("Payment verification failed. Please try again.");
                     }
+                },
+                prefill: {
+                    name: "Customer",
+                    email: "customer@example.com",
+                    contact: ""
+                },
+                notes: {
+                    address: "E-commerce Store",
+                    product_id: product.id,
+                    product_name: product.title
                 },
                 theme: {
                     color: "#5f63b8"
+                },
+                modal: {
+                    ondismiss: function() {
+                        console.log("Payment modal closed");
+                    }
                 }
             };
+            
+            console.log("Opening Razorpay with options:", options);
+            
             if (!window.Razorpay) {
-                alert("Razorpay SDK failed to load. Check your network.");
+                alert("Razorpay SDK failed to load. Please refresh the page and try again.");
                 return;
             }
+            
             const rzp1 = new window.Razorpay(options);
             rzp1.open();
 
-
-            // const options = {
-            //     key: key_id,
-            //     amount: checkoutData.paymentResponse.amount,
-            //     currency: "INR",
-            //     name: "Sagar Ray",
-            //     description: "Tutorial of RazorPay",
-            //     image: "https://avatars.githubusercontent.com/u/107414907?v=4",
-            //     order_id: checkoutData.paymentResponse.id,
-            //     callback_url: "http://localhost:8080/api/v1/paymentverification",
-            //     prefill: {
-            //         name: "Gaurav Kumar",
-            //         email: "gaurav.kumar@example.com",
-            //         contact: "9999999999"
-            //     },
-            //     notes: {
-            //         "address": "Razorpay Corporate Office"
-            //     },
-            //     theme: {
-            //         "color": "#121212"
-            //     }
-            // };
-            
-            // const razor = new window.Razorpay(options);
-            // razor.open();
-
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Payment Error:", error);
+            alert(`Payment Error: ${error.message}`);
         }
     };
     
@@ -136,6 +203,30 @@ const ProductPage = () => {
         }
     
         try {
+            // Try deployed backend first, fallback to localhost
+            let backendUrl = "https://ecom-website-beige.vercel.app";
+            
+            try {
+                const res = await fetch(`${backendUrl}/api/v1/addtocart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ product, token })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log("Product added to cart successfully:", data);
+                    alert("Product added to cart successfully");
+                    return;
+                }
+            } catch (error) {
+                console.log("Deployed backend failed, trying localhost...");
+            }
+
+            // Fallback to localhost
             const res = await fetch('http://localhost:8080/api/v1/addtocart', {
                 method: 'POST',
                 headers: {
@@ -144,14 +235,14 @@ const ProductPage = () => {
                 },
                 body: JSON.stringify({ product, token })
             });
-    
-            if (!res.ok) {
+
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Product added to cart successfully:", data);
+                alert("Product added to cart successfully");
+            } else {
                 throw new Error(`Failed to add to cart: ${res.status}`);
             }
-    
-            const data = await res.json();
-            console.log("Product added to cart successfully:", data);
-            alert("Product added to cart successfully");
         } catch (error) {
             console.error("Error:", error);
             alert("Failed to add product to cart. Please try again later.");
